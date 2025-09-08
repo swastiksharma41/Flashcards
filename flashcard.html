@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waste Management Learning Flashcards</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #2c3e50;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .module-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .module-btn {
+            background: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            font-size: 1rem;
+        }
+        
+        .module-btn.active {
+            background: #27ae60;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(39, 174, 96, 0.3);
+        }
+        
+        .module-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        .flashcard-container {
+            perspective: 1000px;
+            margin: 0 auto;
+            width: 100%;
+            max-width: 600px;
+            height: 400px;
+            margin-bottom: 30px;
+        }
+        
+        .flashcard {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+        
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .flashcard-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+        
+        .flashcard-front {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+        }
+        
+        .flashcard-back {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            transform: rotateY(180deg);
+        }
+        
+        .card-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+        }
+        
+        .card-content {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            max-width: 500px;
+        }
+        
+        .card-emoji {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+        }
+        
+        .navigation {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .nav-btn {
+            background: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-btn:hover {
+            background: #34495e;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .progress-bar {
+            background: rgba(255,255,255,0.2);
+            height: 8px;
+            border-radius: 20px;
+            margin: 0 20px;
+            flex: 1;
+            max-width: 200px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            background: #27ae60;
+            height: 100%;
+            border-radius: 20px;
+            transition: width 0.3s ease;
+        }
+        
+        .card-counter {
+            color: white;
+            font-weight: bold;
+            background: rgba(0,0,0,0.2);
+            padding: 10px 20px;
+            border-radius: 20px;
+        }
+        
+        .flip-hint {
+            color: rgba(255,255,255,0.8);
+            font-size: 0.9rem;
+            margin-top: 20px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+        
+        .module-info {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .key-points {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .key-point {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #27ae60;
+        }
+        
+        .shuffle-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: 10px;
+        }
+        
+        .shuffle-btn:hover {
+            background: #c0392b;
+            transform: scale(1.05);
+        }
+        
+        @media (max-width: 768px) {
+            .flashcard-container {
+                height: 350px;
+            }
+            
+            .flashcard-face {
+                padding: 25px;
+            }
+            
+            .card-title {
+                font-size: 1.5rem;
+            }
+            
+            .card-content {
+                font-size: 1rem;
+            }
+            
+            .module-selector {
+                gap: 10px;
+            }
+            
+            .module-btn {
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Waste Management Flashcards</h1>
+            <p>Interactive learning cards for sustainable waste practices</p>
+        </div>
+        
+        <div class="module-selector">
+            <button class="module-btn active" onclick="selectModule(0)">Module 1: Foundation</button>
+            <button class="module-btn" onclick="selectModule(1)">Module 2: Segregation</button>
+            <button class="module-btn" onclick="selectModule(2)">Module 3: Reduce & Reuse</button>
+            <button class="module-btn" onclick="selectModule(3)">Module 4: Recycling</button>
+            <button class="module-btn" onclick="selectModule(4)">Module 5: Beyond Bins</button>
+        </div>
+        
+        <div class="module-info" id="moduleInfo">
+            <h3 id="moduleTitle">Module 1: The Foundation of Waste</h3>
+            <p id="moduleDescription">Understanding the basics of waste management and environmental impact</p>
+        </div>
+        
+        <div class="navigation">
+            <button class="nav-btn" id="prevBtn" onclick="previousCard()">← Previous</button>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="card-counter" id="cardCounter">1 / 7</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill2"></div>
+            </div>
+            <button class="nav-btn" id="nextBtn" onclick="nextCard()">Next →</button>
+            <button class="shuffle-btn" onclick="shuffleCards()">🔀 Shuffle</button>
+        </div>
+        
+        <div class="flashcard-container">
+            <div class="flashcard" id="flashcard" onclick="flipCard()">
+                <div class="flashcard-face flashcard-front">
+                    <div class="card-emoji" id="cardEmoji">🌍</div>
+                    <div class="card-title" id="frontTitle">Environmental Impact</div>
+                    <div class="card-content" id="frontContent">What happens when we don't manage waste properly?</div>
+                    <div class="flip-hint">Click to reveal answer</div>
+                </div>
+                <div class="flashcard-face flashcard-back">
+                    <div class="card-title" id="backTitle">Environmental Consequences</div>
+                    <div class="card-content" id="backContent">Improper waste management leads to pollution of air, water, and soil, harming ecosystems and human health. It contributes to greenhouse gas emissions and depletes natural resources.</div>
+                    <div class="flip-hint">Click to see question again</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const modules = [
+            {
+                title: "Module 1: The Foundation of Waste",
+                description: "Understanding the basics of waste management and environmental impact",
+                cards: [
+                    {
+                        emoji: "🌍",
+                        frontTitle: "Environmental Impact",
+                        frontContent: "What happens when we don't manage waste properly?",
+                        backTitle: "Environmental Consequences",
+                        backContent: "Improper waste management leads to pollution of air, water, and soil, harming ecosystems and human health. It contributes to greenhouse gas emissions and depletes natural resources."
+                    },
+                    {
+                        emoji: "🗂️",
+                        frontTitle: "Types of Waste",
+                        frontContent: "What are the four main categories of waste?",
+                        backTitle: "Four Main Categories",
+                        backContent: "1. WET WASTE - Organic/biodegradable materials\n2. DRY WASTE - Recyclable materials like paper, plastic\n3. HAZARDOUS WASTE - Toxic materials, chemicals\n4. E-WASTE - Electronic devices and components"
+                    },
+                    {
+                        emoji: "♻️",
+                        frontTitle: "The 3 R's",
+                        frontContent: "What are the three fundamental principles of waste management?",
+                        backTitle: "Reduce, Reuse, Recycle",
+                        backContent: "REDUCE - Use less and buy only what you need\nREUSE - Find new purposes for items before discarding\nRECYCLE - Process materials into new products\nThis hierarchy prioritizes waste prevention over disposal."
+                    },
+                    {
+                        emoji: "🏠",
+                        frontTitle: "Waste Sources",
+                        frontContent: "What are common sources of household waste?",
+                        backTitle: "Household Waste Sources",
+                        backContent: "Kitchen scraps, packaging materials, old clothes, electronics, batteries, cleaning products, paper, and personal care items. Each category requires different handling methods."
+                    },
+                    {
+                        emoji: "🔄",
+                        frontTitle: "Circular Economy",
+                        frontContent: "How does circular economy change our view of waste?",
+                        backTitle: "Waste as Resource",
+                        backContent: "In a circular economy, waste becomes input for another process. Materials flow in closed loops, minimizing extraction of new resources and reducing environmental impact."
+                    },
+                    {
+                        emoji: "👤",
+                        frontTitle: "Personal Impact",
+                        frontContent: "How do individual choices affect waste generation?",
+                        backTitle: "Individual Power",
+                        backContent: "Every purchase decision, disposal choice, and consumption habit impacts waste generation. Small daily actions compound to create significant environmental effects."
+                    },
+                    {
+                        emoji: "🎯",
+                        frontTitle: "Key Action",
+                        frontContent: "What's the most important first step in waste management?",
+                        backTitle: "Source Segregation",
+                        backContent: "Separating waste at the source (where it's generated) is crucial. It prevents contamination and enables proper processing of different waste types."
+                    }
+                ]
+            },
+            {
+                title: "Module 2: The Art of Segregation",
+                description: "Master the techniques of proper waste separation",
+                cards: [
+                    {
+                        emoji: "🗑️",
+                        frontTitle: "Wet vs Dry",
+                        frontContent: "How do you separate waste into wet and dry categories?",
+                        backTitle: "Segregation Method",
+                        backContent: "WET: Food scraps, garden waste, biodegradable items\nDRY: Paper, plastic, metal, glass, textiles\nUse separate bins and keep dry waste clean for better recycling."
+                    },
+                    {
+                        emoji: "📦",
+                        frontTitle: "Bin Guidelines",
+                        frontContent: "What belongs in each specific bin?",
+                        backTitle: "Bin Classification",
+                        backContent: "GREEN (Wet): Kitchen waste, leaves, food scraps\nBLUE (Dry): Clean recyclables\nRED (Hazardous): Batteries, medicines, chemicals\nSpecial bins for e-waste and glass."
+                    },
+                    {
+                        emoji: "⚠️",
+                        frontTitle: "Hazardous Waste",
+                        frontContent: "How should batteries and electronics be handled?",
+                        backTitle: "Safe Handling",
+                        backContent: "Never mix with regular waste. Store in separate containers, find certified collection centers, and never dispose in regular bins. Many items contain toxic materials."
+                    },
+                    {
+                        emoji: "🍎",
+                        frontTitle: "Food Waste",
+                        frontContent: "What can be done with kitchen scraps?",
+                        backTitle: "Composting Potential",
+                        backContent: "Fruit peels, vegetable scraps, coffee grounds, and eggshells can be composted. Avoid meat, dairy, and oily foods in home composting."
+                    },
+                    {
+                        emoji: "🧽",
+                        frontTitle: "Clean Recyclables",
+                        frontContent: "Why should recyclables be cleaned before disposal?",
+                        backTitle: "Preparation Importance",
+                        backContent: "Contaminated recyclables can ruin entire batches. Rinse containers, remove labels when possible, and ensure items are dry and clean."
+                    },
+                    {
+                        emoji: "📍",
+                        frontTitle: "Special Waste",
+                        frontContent: "Where do you take items that don't fit regular categories?",
+                        backTitle: "Drop-off Points",
+                        backContent: "Electronics stores for e-waste, pharmacies for medicines, auto shops for batteries, paint stores for hazardous chemicals. Research local programs."
+                    },
+                    {
+                        emoji: "❌",
+                        frontTitle: "Recycling Myths",
+                        frontContent: "What common recycling beliefs are actually false?",
+                        backTitle: "Myth Busting",
+                        backContent: "Not all plastics are recyclable, pizza boxes with grease aren't recyclable, and 'biodegradable' doesn't mean compostable at home. Always verify local guidelines."
+                    }
+                ]
+            },
+            {
+                title: "Module 3: Reducing and Reusing",
+                description: "Creative strategies to minimize waste generation",
+                cards: [
+                    {
+                        emoji: "🛒",
+                        frontTitle: "Mindful Shopping",
+                        frontContent: "How can shopping habits reduce waste?",
+                        backTitle: "Smart Purchasing",
+                        backContent: "Choose products with minimal packaging, buy in bulk, select reusable over disposable, and avoid single-use items. Quality over quantity reduces replacement needs."
+                    },
+                    {
+                        emoji: "🍳",
+                        frontTitle: "Meal Planning",
+                        frontContent: "How does meal prep prevent food waste?",
+                        backTitle: "Strategic Planning",
+                        backContent: "Plan weekly meals, create shopping lists, use ingredients across multiple meals, and store food properly. This reduces spoilage and overbuying."
+                    },
+                    {
+                        emoji: "💡",
+                        frontTitle: "Creative Reusing",
+                        frontContent: "How can old jars become useful storage?",
+                        backTitle: "Repurposing Ideas",
+                        backContent: "Glass jars become spice containers, craft supply storage, leftover food containers, or plant holders. Clean thoroughly and remove labels for best results."
+                    },
+                    {
+                        emoji: "🎒",
+                        frontTitle: "Zero-Waste Swaps",
+                        frontContent: "What reusable items replace disposables?",
+                        backTitle: "Sustainable Alternatives",
+                        backContent: "Cloth bags for shopping, metal water bottles, glass food containers, bamboo utensils, and rechargeable batteries. Initial investment pays off long-term."
+                    },
+                    {
+                        emoji: "🔧",
+                        frontTitle: "Repair Culture",
+                        frontContent: "When should you repair instead of replace?",
+                        backTitle: "Fix vs Replace",
+                        backContent: "Repair when cost is less than 50% of replacement, item has sentimental value, or repair extends useful life significantly. Learn basic repair skills."
+                    },
+                    {
+                        emoji: "🤝",
+                        frontTitle: "Community Sharing",
+                        frontContent: "How can community swaps reduce waste?",
+                        backTitle: "Sharing Economy",
+                        backContent: "Organize clothing swaps, tool libraries, book exchanges, and give-away events. One person's unwanted item becomes another's treasure."
+                    },
+                    {
+                        emoji: "🧪",
+                        frontTitle: "DIY Products",
+                        frontContent: "What household products can you make yourself?",
+                        backTitle: "Homemade Solutions",
+                        backContent: "All-purpose cleaners with vinegar, baking soda scrubs, natural deodorants, and reusable food wraps. Reduces packaging and chemical exposure."
+                    }
+                ]
+            },
+            {
+                title: "Module 4: The Power of Recycling",
+                description: "Understanding recycling processes and maximizing impact",
+                cards: [
+                    {
+                        emoji: "🚛",
+                        frontTitle: "Recycling Journey",
+                        frontContent: "What happens to recyclables after collection?",
+                        backTitle: "Processing Path",
+                        backContent: "Collection → Sorting → Cleaning → Processing → Manufacturing → New products. Each step requires energy but saves resources compared to virgin materials."
+                    },
+                    {
+                        emoji: "🔄",
+                        frontTitle: "Transformation Process",
+                        frontContent: "How are materials turned into new products?",
+                        backTitle: "Material Processing",
+                        backContent: "Plastics are melted and reformed, paper is pulped and reformed, metals are melted and remolded, and glass is crushed and remelted. Each material has unique processes."
+                    },
+                    {
+                        emoji: "⚡",
+                        frontTitle: "Energy Benefits",
+                        frontContent: "How much energy does recycling save?",
+                        backTitle: "Efficiency Gains",
+                        backContent: "Recycling aluminum saves 95% energy, steel saves 60%, paper saves 40%, and plastic saves 70% compared to virgin production. Significant carbon footprint reduction."
+                    },
+                    {
+                        emoji: "🔢",
+                        frontTitle: "Plastic Codes",
+                        frontContent: "What do the numbers on plastics mean?",
+                        backTitle: "Identification System",
+                        backContent: "1-2: Most recyclable (bottles, containers)\n3-6: Limited recycling\n7: Mixed plastics, rarely recyclable\nCheck local programs for accepted numbers."
+                    },
+                    {
+                        emoji: "📄",
+                        frontTitle: "Paper Preparation",
+                        frontContent: "How should paper and cardboard be prepared?",
+                        backTitle: "Proper Preparation",
+                        backContent: "Remove tape, staples, and plastic inserts. Flatten cardboard, keep paper dry, and separate different types. Contaminated paper (grease, food) goes in compost."
+                    },
+                    {
+                        emoji: "🏘️",
+                        frontTitle: "Local Programs",
+                        frontContent: "How do you find recycling options in your area?",
+                        backTitle: "Community Resources",
+                        backContent: "Contact local waste management, check municipal websites, visit recycling centers, and ask at retailers. Programs vary by location and material type."
+                    },
+                    {
+                        emoji: "🏷️",
+                        frontTitle: "Smart Shopping",
+                        frontContent: "How do product labels guide recycling choices?",
+                        backTitle: "Label Reading",
+                        backContent: "Look for recycled content percentages, recyclability symbols, and material composition. Choose products designed for end-of-life recovery."
+                    }
+                ]
+            },
+            {
+                title: "Module 5: Beyond the Bins",
+                description: "Advanced techniques and community leadership",
+                cards: [
+                    {
+                        emoji: "🌱",
+                        frontTitle: "Composting Magic",
+                        frontContent: "How does organic waste become rich soil?",
+                        backTitle: "Decomposition Process",
+                        backContent: "Microorganisms break down organic matter with proper moisture, air, and temperature. Result is nutrient-rich compost that improves soil health and plant growth."
+                    },
+                    {
+                        emoji: "🏠",
+                        frontTitle: "Home Composting",
+                        frontContent: "How do you start composting at home?",
+                        backTitle: "Getting Started",
+                        backContent: "Choose browns (dry leaves, paper) and greens (food scraps, fresh grass). Layer in 3:1 ratio, turn regularly, keep moist, and harvest in 3-6 months."
+                    },
+                    {
+                        emoji: "☠️",
+                        frontTitle: "Hazardous Disposal",
+                        frontContent: "How should paint and medicines be disposed?",
+                        backTitle: "Safe Disposal Methods",
+                        backContent: "Never pour down drains or put in regular trash. Take to designated collection events, pharmacy take-back programs, or hazardous waste facilities."
+                    },
+                    {
+                        emoji: "🎨",
+                        frontTitle: "Upcycling Art",
+                        frontContent: "How does upcycling create higher value?",
+                        backTitle: "Creative Transformation",
+                        backContent: "Transform waste into products of higher quality or value. Examples: furniture from pallets, art from bottle caps, planters from containers. Creativity adds value."
+                    },
+                    {
+                        emoji: "🌿",
+                        frontTitle: "Community Gardens",
+                        frontContent: "How can compost benefit local communities?",
+                        backTitle: "Shared Resources",
+                        backContent: "Donate finished compost to community gardens, schools, or neighbors. Creates local food security and builds community connections around sustainability."
+                    },
+                    {
+                        emoji: "📱",
+                        frontTitle: "Smart Technology",
+                        frontContent: "How can apps and smart bins improve waste management?",
+                        backTitle: "Digital Solutions",
+                        backContent: "Apps track waste habits, find recycling locations, and provide disposal guidance. Smart bins monitor fill levels and optimize collection routes for efficiency."
+                    },
+                    {
+                        emoji: "📢",
+                        frontTitle: "Community Leadership",
+                        frontContent: "How can you become a waste management advocate?",
+                        backTitle: "Leading Change",
+                        backContent: "Educate neighbors, organize cleanup events, advocate for better local policies, start community composting programs, and model sustainable behaviors consistently."
+                    }
+                ]
+            }
+        ];
+        
+        let currentModule = 0;
+        let currentCard = 0;
+        let isFlipped = false;
+        
+        function selectModule(moduleIndex) {
+            currentModule = moduleIndex;
+            currentCard = 0;
+            isFlipped = false;
+            
+            // Update active button
+            document.querySelectorAll('.module-btn').forEach((btn, index) => {
+                btn.classList.toggle('active', index === moduleIndex);
+            });
+            
+            // Update module info
+            const module = modules[moduleIndex];
+            document.getElementById('moduleTitle').textContent = module.title;
+            document.getElementById('moduleDescription').textContent = module.description;
+            
+            updateCard();
+            updateProgress();
+        }
+        
+        function updateCard() {
+            const module = modules[currentModule];
+            const card = module.cards[currentCard];
+            
+            document.getElementById('cardEmoji').textContent = card.emoji;
+            document.getElementById('frontTitle').textContent = card.frontTitle;
+            document.getElementById('frontContent').textContent = card.frontContent;
+            document.getElementById('backTitle').textContent = card.backTitle;
+            document.getElementById('backContent').textContent = card.backContent;
+            
+            // Reset flip state
+            document.getElementById('flashcard').classList.remove('flipped');
+            isFlipped = false;
+        }
+        
+        function flipCard() {
+            const flashcard = document.getElementById('flashcard');
+            flashcard.classList.toggle('flipped');
+            isFlipped = !isFlipped;
+        }
+        
+        function nextCard() {
+            const module = modules[currentModule];
+            if (currentCard < module.cards.length - 1) {
+                currentCard++;
+                updateCard();
+                updateProgress();
+            }
+        }
+        
+        function previousCard() {
+            if (currentCard > 0) {
+                currentCard--;
+                updateCard();
+                updateProgress();
+            }
+        }
+        
+        function updateProgress() {
+            const module = modules[currentModule];
+            const progress = ((currentCard + 1) / module.cards.length) * 100;
+            
+            document.getElementById('progressFill').style.width = `${progress}%`;
+            document.getElementById('progressFill2').style.width = `${progress}%`;
+            document.getElementById('cardCounter').textContent = `${currentCard + 1} / ${module.cards.length}`;
+            
+            // Update navigation buttons
+            document.getElementById('prevBtn').disabled = currentCard === 0;
+            document.getElementById('nextBtn').disabled = currentCard === module.cards.length - 1;
+        }
+        
+        function shuffleCards() {
+            const module = modules[currentModule];
+            // Fisher-Yates shuffle
+            for (let i = module.cards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [module.cards[i], module.cards[j]] = [module.cards[j], module.cards[i]];
+            }
+            currentCard = 0;
+            updateCard();
+            updateProgress();
+        }
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            switch(e.key) {
+                case 'ArrowLeft':
+                    previousCard();
+                    break;
+                case 'ArrowRight':
+                    nextCard();
+                    break;
+                case ' ':
+                    e.preventDefault();
+                    flipCard();
+                    break;
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                    selectModule(parseInt(e.key) - 1);
+                    break;
+            }
+        });
+        
+        // Initialize
+        updateCard();
+        updateProgress();
+        
+        // Add touch swipe support
+        let startX = 0;
+        let startY = 0;
+        
+        document.getElementById('flashcard').addEventListener('touchstart', function(e) {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        });
+        
+        document.getElementById('flashcard').addEventListener('touchend', function(e) {
+            const endX = e.changedTouches[0].clientX;
+            const endY = e.changedTouches[0].clientY;
+            const diffX = startX - endX;
+            const diffY = startY - endY;
+            
+            // Check if it's a swipe (not a tap)
+            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+                if (diffX > 0) {
+                    nextCard(); // Swipe left = next
+                } else {
+                    previousCard(); // Swipe right = previous
+                }
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>
